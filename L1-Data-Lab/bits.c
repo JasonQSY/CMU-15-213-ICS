@@ -141,8 +141,6 @@ NOTES:
 int bitAnd(int x, int y) {
     return ~(~x | ~y);
 }
-
-
 /*
  * getByte - Extract byte n from word x
  *   Bytes numbered from 0 (LSB) to 3 (MSB)
@@ -152,14 +150,13 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
-    int l = (n ^ 0x0011) << 1;
-    return x << l >> l;
+    return (x >> (n << 3)) & 0xFF;
 }
 /*
  * logicalShift - shift x to the right by n, using a logical shift
  *   Can assume that 0 <= n <= 31
  *   Examples: logicalShift(0x87654321,4) = 0x08765432
- *   Legal ops: ~ & ^ | + << >>
+ *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 20
  *   Rating: 3
  */

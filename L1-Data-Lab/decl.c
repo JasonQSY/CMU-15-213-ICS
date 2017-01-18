@@ -14,8 +14,6 @@ test_rec test_set[] = {
 
 
 
-
-
  {"bitAnd", (funct_t) bitAnd, (funct_t) test_bitAnd, 2, "| ~", 8, 1,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
  {"getByte", (funct_t) getByte, (funct_t) test_getByte, 2,

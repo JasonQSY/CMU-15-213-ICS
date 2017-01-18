@@ -1,6 +1,4 @@
 
-
-
 int bitAnd(int, int);
 int test_bitAnd(int, int);
 int getByte(int, int);
