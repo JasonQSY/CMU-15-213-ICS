@@ -150,6 +150,11 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
+    /**
+     * 1. n << 3 shift by byte
+     * 2. x >> remove the right part
+     * 3. & 0xFF get the requested byte
+     */
     return (x >> (n << 3)) & 0xFF;
 }
 /*
@@ -161,7 +166,14 @@ int getByte(int x, int n) {
  *   Rating: 3
  */
 int logicalShift(int x, int n) {
-  return 2;
+    /**
+     * 1. (0x7FFFFFFF >> (n + (-1)) construct 0..0111..111 to make first n bit be 0.
+     * 2. (n + (-1) + !n) = 0 if n = 0,
+     *                    = n-1 if n != 0.
+     * 3. << (!n) | 0x1 no effect if n != 0,
+     *                  = shift left and add 1 if n = 0.
+     */
+    return (x >> n) & (0x7FFFFFFF >> (n + (-1) + !n) << (!n) | 0x1);
 }
 /*
  * bitCount - returns count of number of 1's in word
@@ -171,7 +183,8 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int bitCount(int x) {
-  return 2;
+    // @TODO
+    return 2;
 }
 /*
  * bang - Compute !x without using !
@@ -181,7 +194,8 @@ int bitCount(int x) {
  *   Rating: 4
  */
 int bang(int x) {
-  return 2;
+    // @TODO
+    return 2;
 }
 /*
  * tmin - return minimum two's complement integer
@@ -190,7 +204,7 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+    return 0x80000000;
 }
 /*
  * fitsBits - return 1 if x can be represented as an
@@ -202,7 +216,8 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-  return 2;
+    // fitsBits(0x80000000, 32) = 1.
+    return !((~x) >> (n + (-1)));
 }
 /*
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
@@ -213,6 +228,7 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
+    // @TODO
     return 2;
 }
 /*
@@ -223,7 +239,7 @@ int divpwr2(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    return (~x) + 1;
 }
 /*
  * isPositive - return 1 if x > 0, return 0 otherwise
@@ -233,7 +249,8 @@ int negate(int x) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+    // &(!!x) let isPositive(0) = 0
+    return !(x >> 31) & (!!x);
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
@@ -243,7 +260,8 @@ int isPositive(int x) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    // @TODO
+    return 2;
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
@@ -253,7 +271,8 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int ilog2(int x) {
-  return 2;
+    // @TODO
+    return 2;
 }
 /*
  * float_neg - Return bit-level equivalent of expression -f for
@@ -267,7 +286,8 @@ int ilog2(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
- return 2;
+    // @TODO
+    return 2;
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
@@ -279,7 +299,8 @@ unsigned float_neg(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+    // @TODO
+    return 2;
 }
 /*
  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -293,5 +314,6 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+    // @TODO
+    return 2;
 }
