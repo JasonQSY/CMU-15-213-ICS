@@ -183,8 +183,18 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int bitCount(int x) {
-    // @TODO
-    return 2;
+    /**
+     * Refer to http://stackoverflow.com/questions/3815165/how-to-implement-bitcount-using-only-bitwise-operators
+     */
+    int a = 0;
+
+    a = (x & 0x55555555) + ((x >> 1) & 0x55555555);
+    a = (a & 0x33333333) + ((a >> 2) & 0x33333333);
+    a = (a & 0x0F0F0F0F) + ((a >> 4) & 0x0F0F0F0F);
+    a = (a & 0x00FF00FF) + ((a >> 8) & 0x00FF00FF);
+    a = (a & 0x0000FFFF) + ((a >> 16)& 0x0000FFFF);
+
+    return a;
 }
 /*
  * bang - Compute !x without using !
@@ -194,8 +204,13 @@ int bitCount(int x) {
  *   Rating: 4
  */
 int bang(int x) {
-    // @TODO
-    return 2;
+    x = ( x >> 16 ) | (x & ((0xFF << 8) + 0xFF));
+    x = ( x >> 8 ) | (x & 0xFF);
+    x = ( x >> 4 ) | (x & 0xF);
+    x = ( x >> 2 ) | (x & 0x3);
+    x = ( x >> 1) | (x & 0x1);
+
+    return (~x) & 1;
 }
 /*
  * tmin - return minimum two's complement integer
@@ -204,7 +219,8 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-    return 0x80000000;
+    // just 0x80000000
+    return 1 << 31;
 }
 /*
  * fitsBits - return 1 if x can be represented as an
@@ -216,8 +232,8 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-    // fitsBits(0x80000000, 32) = 1.
-    return !((~x) >> (n + (-1)));
+    // x >> 31 == 1 if x is positive, just a mask
+    return !((~x & ((x >> 31) >> 31)  + ((x & ~(x >> 31) >> 31))) >> (n + (-1)));
 }
 /*
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
@@ -228,8 +244,8 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    // @TODO
-    return 2;
+    // if x is negative, make x exceed the perfect 2-power.
+    return (x + ((x >> 31) & ((1 << n) + ~0))) >> n;
 }
 /*
  * negate - return -x
@@ -260,8 +276,12 @@ int isPositive(int x) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    // @TODO
-    return 2;
+    // if x = 0x80000000, ~x+1 becomes itself. => if x = 0x80000000, return 1
+    // if y = 0x80000000, ~y+1 becomes itself. simple_check = 1, ok actually
+
+    int simple_check = (((~x + 1) + y) >> 31 & 0x1); // = 1 if x > y
+    int is_bound = (( (x & (1 << 31)) ^ (y & (1 << 31)) ) >> 31) & 1;
+    return (!is_bound & !simple_check) | (is_bound & ( (x & (1 << 31)) >> 31 ) );
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
@@ -271,8 +291,17 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int ilog2(int x) {
-    // @TODO
-    return 2;
+    int a16, a8, a4, a2, a1, b16, b8, b4, b2;
+	a16 = !(!(x >> 16));
+	b16 = a16 << 4;
+	a8 = !(!(x >> (8 + b16)));
+	b8 = (a8 << 3) + b16;
+	a4 = !(!(x >> (4 + b8)));
+	b4 = (a4 << 2) + b8;
+	a2 = !(!(x >> (2 + b4)));
+	b2 = (a2 << 1) + b4;
+	a1 = (x >> (1 + b2));
+	return a1 + b2;
 }
 /*
  * float_neg - Return bit-level equivalent of expression -f for
@@ -286,8 +315,12 @@ int ilog2(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
-    // @TODO
-    return 2;
+    // deal with NaN
+    if (uf != 0x7F800000 && uf != 0xFF800000 && (uf & 0x7F800000) == 0x7F800000) {
+        return uf;
+    }
+
+    return uf ^ 0x80000000;
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
@@ -299,8 +332,33 @@ unsigned float_neg(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-    // @TODO
-    return 2;
+    unsigned sign = 0x0, e = 0x0, f = 0x0;
+
+    // judge sign
+    if (x > 0) {
+        sign = 0x0;
+    } else if (x < 0) {
+        sign = 0x1;
+        x = ~x + 1;
+    } else { // x = 0
+        return x;
+    }
+
+    e = 0;
+    while (x != 0) {
+        f += (x & 0x1) << e;
+        e++;
+        // logical shift by 1
+        x = (x >> 1) & (0x7FFFFFFF >> (1 + (-1) + !1) << (!1) | 0x1);
+    }
+    e = e - 1;
+
+    f = f & ~(0x1 << e);
+    if (e > 23) {
+        f = f >> (e - 23);
+    }
+    e = e + 127;
+    return (sign << 31) + (e << 23) + f;
 }
 /*
  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -314,6 +372,16 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-    // @TODO
-    return 2;
+    unsigned sign = (uf >> 31) & 0x1;
+    unsigned e = (uf >> 23) & 0xFF;
+    unsigned f = uf & 0x7FFFFF;
+
+    if (e == 0xFF) { // inf
+        return uf;
+    } else if (e > 0) { // normal
+        e = e + 1;
+        return (sign << 31) + (e << 23) + f;
+    } else { // denormal;
+        return (uf << 1) | (sign << 31);
+    }
 }
