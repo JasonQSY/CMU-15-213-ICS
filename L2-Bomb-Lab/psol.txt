@@ -1,2 +1,5 @@
 Border relations with Canada have never been better.
-50 45 77 77 77 77
+1 2 4 8 16 32
+7 327
+7 0
+2 1 6 5 4 3
