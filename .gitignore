@@ -1,5 +1,8 @@
 # global ignore
 *.o
+.vagrant
+*.log
+.DS_STORE
 
 # lab 1 data lab
 L1-Data-Lab/btest
@@ -7,4 +10,12 @@ L1-Data-Lab/fshow
 L1-Data-Lab/ishow
 
 # lab 2 bomb lab
-L2-Bomb-Lab/.vagrant
+# L2-Bomb-Lab/.vagrant
+# (empty now)
+
+# lab 5 shell lab
+L5-Shell-Lab/tsh
+L5-Shell-Lab/myspin
+L5-Shell-Lab/mysplit
+L5-Shell-Lab/mystop
+L5-Shell-Lab/myint
