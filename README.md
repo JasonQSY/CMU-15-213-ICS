@@ -26,6 +26,9 @@ sudo apt install build-essential
 # For lab2 - bomb lab
 sudo apt install binutils
 sudo apt install gdb
+
+# For lab6 - malloc lab
+sudo apt install gcc-multilib
 ```
 
 ## Progress
